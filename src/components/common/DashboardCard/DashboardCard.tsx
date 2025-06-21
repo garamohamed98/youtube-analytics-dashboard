@@ -1,7 +1,7 @@
 import { Card, styled } from "@mui/material";
 
 const DashboardCard = styled(Card, {
-  shouldForwardProp: (prop) => prop !== "variant",
+  shouldForwardProp: (prop) => prop !== "filled",
 })<{ filled?: boolean }>(({ theme, filled = true }) => ({
   elevation: 0,
   boxShadow: "none",
