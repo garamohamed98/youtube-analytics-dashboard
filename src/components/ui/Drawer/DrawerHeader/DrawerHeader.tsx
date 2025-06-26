@@ -28,20 +28,23 @@ const DrawerHeader = ({
           <MenuIcon />
         </IconButton>
       )}
-      <Box px="20px">
-        <Box
-          component="img"
-          src="src/assets/logo.png"
-          alt="logo"
-          loading="lazy"
-          sx={{
-            width: "100%",
-            maxWidth: 90,
-            aspectRatio: "310 / 112",
-            display: "block",
-          }}
-        />
-      </Box>
+      {(open || isMobile) && (
+        <Box px="20px">
+          <Box
+            component="img"
+            src="src/assets/logo.png"
+            alt="logo"
+            loading="lazy"
+            sx={{
+              width: "100%",
+              maxWidth: 90,
+              aspectRatio: "310 / 112",
+              display: "block",
+            }}
+          />
+        </Box>
+      )}
+
       {isMobile && (
         <IconButton
           onClick={() => {

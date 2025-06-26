@@ -2,7 +2,7 @@ import { styled, type CSSObject, type Theme } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
 
 const openedMixin = (theme: Theme): CSSObject => ({
-  width: `100%`,
+  width: `70%`,
   [theme.breakpoints.up("sm")]: {
     width: theme.drawerWidth,
   },
