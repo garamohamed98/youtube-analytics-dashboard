@@ -76,7 +76,7 @@ export const themeSettings = (mode: PaletteMode): ThemeOptions => {
               main: color.primary[500],
               light: color.primary[200],
               dark: color.primary[800],
-              contrastText: "#c5c8d0",
+              contrastText: "#101213",
             },
             background: {
               default: color.background.default,
@@ -92,7 +92,7 @@ export const themeSettings = (mode: PaletteMode): ThemeOptions => {
               main: color.primary[500],
               light: color.primary[200],
               dark: color.primary[800],
-              contrastText: "#c5c8d0",
+              contrastText: "#ffffff",
             },
             background: {
               default: color.background.default,
@@ -125,6 +125,22 @@ export const themeSettings = (mode: PaletteMode): ThemeOptions => {
     },
     typography: {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: 14,
+      h1: {
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        fontSize: 40,
+        fontWeight: 600,
+      },
+      h2: {
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        fontSize: 18,
+        fontWeight: 600,
+      },
+      h3: {
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        fontSize: 12,
+        fontWeight: 400,
+      },
     },
   };
 };
