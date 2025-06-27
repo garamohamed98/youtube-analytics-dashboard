@@ -1,47 +1,26 @@
 import {
   Box,
-  Button,
   Divider,
   Switch,
-  Tab,
-  Tabs,
-  TextField,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
+import SettingsTab from "../../components/ui/Settings/SettingsTab";
+import TabPanel from "../../components/ui/Settings/TabPanel";
+import ChannelURLForm from "../../components/ui/Settings/ChannelURLForm";
 
-const TabPanel = ({
-  value,
-  index,
-  children,
-}: {
-  value: number;
-  index: number;
-  children: React.ReactNode;
-}) => {
-  return (
-    <Box hidden={value !== index} width="100%" my="20px">
-      {children}
-    </Box>
-  );
-};
+
 
 const Settings = () => {
   const [showedTab, setShawedTab] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (newValue: number) => {
     setShawedTab(newValue);
   };
 
   return (
-    <Grid container spacing={4}>
-      <Grid size={{ xs: 12, md: 12 }}>
-        <Tabs value={showedTab} onChange={handleChange}>
-          <Tab label="Configuration" />
-          <Tab label="Profile" disabled />
-        </Tabs>
-      </Grid>
+    <SettingsTab showedTab={showedTab} handleChangeTab={handleChangeTab}>
       <TabPanel value={showedTab} index={0}>
         <Grid container spacing={2} alignItems="center">
           <Grid size={{ xs: 12, md: 5 }}>
@@ -53,16 +32,7 @@ const Settings = () => {
               </Typography>
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 5 }}>
-            <TextField
-              label="Youtube URL"
-              variant="outlined"
-              sx={{ width: "100%" }}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 1 }}>
-            <Button variant="contained">Change</Button>
-          </Grid>
+          <ChannelURLForm />
           <Grid size={{ xs: 12, md: 11 }}>
             <Divider sx={{ p: "10px" }} />
           </Grid>
@@ -81,7 +51,7 @@ const Settings = () => {
           </Grid>
         </Grid>
       </TabPanel>
-    </Grid>
+    </SettingsTab>
   );
 };
 
