@@ -6,6 +6,7 @@ import {
 import { useMemo } from "react";
 
 import "@mui/material/styles";
+import { useTheme } from "../hooks/theme/useTheme";
 
 declare module "@mui/material/styles" {
   interface Theme {
@@ -146,7 +147,9 @@ export const themeSettings = (mode: PaletteMode): ThemeOptions => {
 };
 
 export const useMode = () => {
-  const mode = "dark";
+  const {
+    state: { mode },
+  } = useTheme();
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   return [theme];
 };
