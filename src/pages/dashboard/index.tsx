@@ -1,16 +1,10 @@
 import { Box } from "@mui/material";
-import { useSelector } from "react-redux";
-import {
-  selectChannelData,
-  selectChannelError,
-  selectChannelStatus,
-} from "../../features/channel/channelSelectors.ts";
-
+import { useChannel } from "../../hooks/channel/useChannel.ts";
 
 const Dashboard = () => {
-  const data = useSelector(selectChannelData);
-  const error = useSelector(selectChannelError);
-  const status = useSelector(selectChannelStatus);
+  const {
+    state: { data, error, status },
+  } = useChannel();
 
   if (status === "failed") return <Box>error: {error} </Box>;
 

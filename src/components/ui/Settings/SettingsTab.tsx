@@ -10,6 +10,8 @@ const SettingsTab = ({
   showedTab: number;
   handleChangeTab: (newValue: number) => void;
 }) => {
+
+
   const onChange = (_: React.SyntheticEvent, newValue: number) => {
     handleChangeTab(newValue);
   };

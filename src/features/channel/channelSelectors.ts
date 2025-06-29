@@ -1,5 +1,7 @@
 import type { RootState } from "../../app/store";
 
 export const selectChannelData = (state: RootState) => state.channel.data;
-export const selectChannelError = (state: RootState) => state.channel.error;
-export const selectChannelStatus = (state: RootState) => state.channel.status;
+export const selectChannelSearchAndLoadStatus = (state: RootState) => state.channel.searchAndLoad.status;
+export const selectChannelSearchAndLoadError = (state: RootState) => state.channel.searchAndLoad.error;
+export const selectChannelId = (state: RootState) => state.channel.channelId;
+export const selectChannelURL = (state: RootState) => state.channel.URL;

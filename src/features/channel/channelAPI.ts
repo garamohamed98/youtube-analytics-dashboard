@@ -1,12 +1,59 @@
 import api from "../../services/api.ts";
-import type { channel } from "./channelTypes.ts";
+import type {
+  channelDetailsResponse,
+  channelSearchResponse,
+} from "./channelTypes.ts";
 
-export const fetchChannelAPI = async (): Promise<channel> => {
+export const getChannelByTagAPI = async (
+  query: string
+): Promise<channelSearchResponse> => {
   const response = await api.get("/search", {
     params: {
       part: "snippet",
-      q: "Gymology-l9d",
+      q: query,
       type: "channel",
+      maxResults: 1,
+    },
+  });
+  
+  return response.data;
+};
+
+export const getChannelByIdAPI = async (
+  id: string
+): Promise<channelDetailsResponse> => {
+  const response = await api.get("/channels", {
+    params: {
+      part: "snippet,statistics",
+      id: id,
+    },
+  });
+  return response.data;
+};
+
+export const getChannelByUsernameAPI = async (
+  username: string
+): Promise<channelSearchResponse> => {
+  const response = await api.get("/search", {
+    params: {
+      part: "snippet",
+      q: username,
+      type: "channel",
+      maxResults: 1,
+    },
+  });
+  return response.data;
+};
+
+export const getChannelByCustomNameAPI = async (
+  customName: string
+): Promise<channelSearchResponse> => {
+  const response = await api.get("/search", {
+    params: {
+      part: "snippet",
+      q: customName,
+      type: "channel",
+      maxResults: 1,
     },
   });
   return response.data;
