@@ -17,7 +17,6 @@ const Layout = () => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const handleToggle = () => {
     setOpen((value) => !value);
   };

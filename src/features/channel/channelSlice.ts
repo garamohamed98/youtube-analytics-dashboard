@@ -1,37 +1,171 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { fetchChannel } from "./channelThunks";
-import type { channel } from "./channelTypes";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  getChannelByCustomName,
+  getChannelById,
+  getChannelByTag,
+  getChannelByUsername,
+  getChannelData,
+} from "./channelThunks";
+import type {
+  channelDetailsResponse,
+  channelSearchResponse,
+} from "./channelTypes";
 
 interface initialState {
-  data: channel | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
+  URL: null | string;
+  searchResult: channelSearchResponse | null;
+  data: channelDetailsResponse | null;
+  channelId: null | string;
+  search: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+  load: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+  searchAndLoad: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
 }
 
 const initialState: initialState = {
+  URL: null,
+  searchResult: null,
   data: null,
-  status: "idle",
-  error: null,
+  channelId: null,
+  search: {
+    status: "idle",
+    error: null,
+  },
+  load: {
+    status: "idle",
+    error: null,
+  },
+  searchAndLoad: {
+    status: "idle",
+    error: null,
+  },
 };
 
 const channelSlice = createSlice({
   name: "channel",
   initialState,
-  reducers: {},
+  reducers: {
+    setURL: (state, action: PayloadAction<string>) => {
+      state.URL = action.payload;
+    },
+    clearChannelStates: (state) => {
+      state.URL = null;
+      state.searchResult = null;
+      state.data = null;
+      state.channelId = null;
+      state.search.status = "idle";
+      state.search.error = null;
+      state.load.status = "idle";
+      state.load.error = null;
+      state.searchAndLoad.status = "idle";
+      state.searchAndLoad.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchChannel.pending, (state) => {
-        state.status = "loading";
+      .addCase(getChannelByTag.pending, (state) => {
+        state.search.status = "loading";
       })
-      .addCase(fetchChannel.fulfilled, (state, action) => {
-        state.status = "succeeded";
+      .addCase(getChannelByTag.fulfilled, (state, action) => {
+        state.search.status = "succeeded";
+        state.searchResult = action.payload;
+        if (
+          action.payload.items &&
+          action.payload.items.length > 0 &&
+          action.payload.items[0].id
+        ) {
+          state.channelId = action.payload.items[0].id.channelId;
+        } else {
+          state.channelId = null;
+        }
+      })
+      .addCase(getChannelByTag.rejected, (state, action) => {
+        state.search.status = "failed";
+        state.search.error = (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelById.pending, (state) => {
+        state.load.status = "loading";
+      })
+      .addCase(getChannelById.fulfilled, (state, action) => {
+        state.load.status = "succeeded";
         state.data = action.payload;
+        if (action.payload.items && action.payload.items.length > 0) {
+          state.channelId = action.payload.items[0].id;
+        } else {
+          state.channelId = null;
+        }
       })
-      .addCase(fetchChannel.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "Unknown error";
+      .addCase(getChannelById.rejected, (state, action) => {
+        state.load.status = "failed";
+        state.load.error = (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelByUsername.pending, (state) => {
+        state.search.status = "loading";
+      })
+      .addCase(getChannelByUsername.fulfilled, (state, action) => {
+        state.search.status = "succeeded";
+        state.searchResult = action.payload;
+        if (
+          action.payload.items &&
+          action.payload.items.length > 0 &&
+          action.payload.items[0].id
+        ) {
+          state.channelId = action.payload.items[0].id.channelId;
+        } else {
+          state.channelId = null;
+        }
+      })
+      .addCase(getChannelByUsername.rejected, (state, action) => {
+        state.search.status = "failed";
+        state.search.error = (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelByCustomName.pending, (state) => {
+        state.search.status = "loading";
+      })
+      .addCase(getChannelByCustomName.fulfilled, (state, action) => {
+        state.search.status = "succeeded";
+        state.searchResult = action.payload;
+        if (
+          action.payload.items &&
+          action.payload.items.length > 0 &&
+          action.payload.items[0].id
+        ) {
+          state.channelId = action.payload.items[0].id.channelId;
+        } else {
+          state.channelId = null;
+        }
+      })
+      .addCase(getChannelByCustomName.rejected, (state, action) => {
+        state.search.status = "failed";
+        state.search.error = (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelData.pending, (state) => {
+        state.searchAndLoad.status = "loading";
+      })
+      .addCase(getChannelData.fulfilled, (state, action) => {
+        state.searchAndLoad.status = "succeeded";
+        state.data = action.payload;
+        if (action.payload.items && action.payload.items.length > 0) {
+          state.channelId = action.payload.items[0].id;
+        } else {
+          state.channelId = null;
+        }
+      })
+      .addCase(getChannelData.rejected, (state, action) => {
+        state.searchAndLoad.status = "failed";
+        state.searchAndLoad.error =
+          (action.payload as string) || "Unknown error";
       });
   },
 });
 
+export const { clearChannelStates, setURL } = channelSlice.actions;
 export default channelSlice.reducer;

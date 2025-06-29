@@ -4,6 +4,7 @@ import Dashboard from "../pages/dashboard";
 import Settings from "../pages/settings";
 import { loader as dashboardLoader } from "../pages/dashboard/loader";
 import { Box } from "@mui/material";
+import { loader as layoutLoader } from "../components/layout/loader.ts";
 
 const Loading = () => {
   return <Box>loading ...</Box>;
@@ -13,6 +14,8 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
+    loader: layoutLoader,
+    HydrateFallback: Loading,
     children: [
       {
         index: true,
