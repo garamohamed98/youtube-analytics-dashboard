@@ -1,16 +1,10 @@
-import {
-  Box,
-  Divider,
-  Switch,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
 import SettingsTab from "../../components/ui/Settings/SettingsTab";
 import TabPanel from "../../components/ui/Settings/TabPanel";
 import ChannelURLForm from "../../components/ui/Settings/ChannelURLForm";
-
-
+import ThemeModeForm from "../../components/ui/Settings/ThemeModeForm";
 
 const Settings = () => {
   const [showedTab, setShawedTab] = useState(0);
@@ -46,9 +40,7 @@ const Settings = () => {
               </Typography>
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 1 }}>
-            <Switch />
-          </Grid>
+          <ThemeModeForm />
         </Grid>
       </TabPanel>
     </SettingsTab>
