@@ -16,6 +16,12 @@ export interface channelDetailsResponse {
   items: [
     {
       id: string;
+      statistics: {
+        viewCount: string;
+        subscriberCount: string;
+        hiddenSubscriberCount: boolean;
+        videoCount: string;
+      };
     }
   ];
 }
