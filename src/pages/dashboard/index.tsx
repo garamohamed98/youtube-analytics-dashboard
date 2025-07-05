@@ -2,11 +2,21 @@ import { Box, Divider } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useChannel } from "../../hooks/channel/useChannel";
 import CardStatisticsList from "../../components/ui/Dashboard/CardStatisticsList";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const {
     state: { searchAndLoadstatus, searchAndLoardError },
+    actions: { startAutoRefresh, stopAutoRefresh },
   } = useChannel();
+
+  useEffect(() => {
+    startAutoRefresh();
+    
+    return () => {
+      stopAutoRefresh();
+    };
+  }, []);
 
   if (searchAndLoadstatus === "failed")
     return <Box>error: {searchAndLoardError}</Box>;

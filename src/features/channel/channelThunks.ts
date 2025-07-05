@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  getChannelByCustomNameAPI,
   getChannelByIdAPI,
   getChannelByTagAPI,
   getChannelByUsernameAPI,
@@ -54,65 +55,69 @@ export const getChannelByCustomName = createAsyncThunk(
       if (!customName) {
         return rejectWithValue("No parameter is provided");
       }
-      return await getChannelByUsernameAPI(customName);
+      return await getChannelByCustomNameAPI(customName);
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch channel");
     }
   }
 );
 
+const fetchChannelData = async (
+  props: { format: string; path: string } | null,
+  { rejectWithValue }: { rejectWithValue: (value: any) => any }
+) => {
+  try {
+    if (!props) {
+      return rejectWithValue("No parameter is provided");
+    }
+    const { format, path } = props;
+    if (!format) {
+      return rejectWithValue("No form is provided");
+    }
+    if (!path) {
+      return rejectWithValue("No path is provided");
+    }
+    if (format === "id") {
+      const directIdResult = await getChannelByIdAPI(path);
+      if (!directIdResult.items || directIdResult.items.length < 1) {
+        return rejectWithValue("The id have no channel");
+      }
+      return directIdResult;
+    }
+    if (format === "tag" || format === "username" || format === "custom") {
+      const searchResult = await (format === "tag"
+        ? getChannelByTagAPI(path)
+        : format === "username"
+        ? getChannelByUsernameAPI(path)
+        : getChannelByCustomNameAPI(path));
+      if (
+        !searchResult.items ||
+        searchResult.items.length < 1 ||
+        !searchResult.items[0].id.channelId
+      ) {
+        return rejectWithValue("channel not found");
+      }
+      const dataResult = await getChannelByIdAPI(
+        searchResult.items[0].id.channelId
+      );
+      if (!dataResult.items || dataResult.items.length < 1) {
+        return rejectWithValue("channel not found");
+      }
+      return dataResult;
+    }
+
+    return rejectWithValue("Invalid form");
+  } catch (error: any) {
+    return rejectWithValue(error.message || "Failed to fetch channel");
+  }
+};
+
 export const getChannelData = createAsyncThunk(
   "channel/getChannelData",
-  async (
-    props: { format: string; path: string } | null,
-    { dispatch, rejectWithValue }
-  ) => {
-    try {
-      if (!props) {
-        return rejectWithValue("No parameter is provided");
-      }
-      const { format, path } = props;
-      if (!format) {
-        return rejectWithValue("No form is provided");
-      }
-      if (!path) {
-        return rejectWithValue("No path is provided");
-      }
-      if (format === "id") {
-        console.log("it's an id format");
-        const directIdResult = await dispatch(getChannelById(path)).unwrap();
-        if (!directIdResult.items || directIdResult.items.length < 1) {
-          return rejectWithValue("The id have no channel");
-        }
-        return directIdResult;
-      }
-      if (format === "tag" || format === "username" || format === "custom") {
-        const searchResult = await dispatch(
-          format === "tag"
-            ? getChannelByTag(path)
-            : format === "username"
-            ? getChannelByUsername(path)
-            : getChannelByCustomName(path)
-        ).unwrap();
-        if (
-          !searchResult.items ||
-          searchResult.items.length < 1 ||
-          !searchResult.items[0].id.channelId
-        ) {
-          return rejectWithValue("channel not found");
-        }
-        const dataResult = await dispatch(
-          getChannelById(searchResult.items[0].id.channelId)
-        ).unwrap();
-        if (!dataResult.items || dataResult.items.length < 1) {
-          return rejectWithValue("channel not found");
-        }
-        return dataResult;
-      }
+  fetchChannelData
+);
 
-      return rejectWithValue("Invalid form");
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel");
-    }
-  }
+export const getChannelDataRealTime = createAsyncThunk(
+  "channel/getChannelDataSilent",
+  fetchChannelData
 );
