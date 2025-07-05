@@ -20,12 +20,14 @@ export const getChannelByTagAPI = async (
 };
 
 export const getChannelByIdAPI = async (
-  id: string
+  id: string,
+  timestamp?: number
 ): Promise<channelDetailsResponse> => {
   const response = await api.get("/channels", {
     params: {
       part: "snippet,statistics",
       id: id,
+      timestamp: timestamp || Date.now(),
     },
   });
   return response.data;

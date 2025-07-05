@@ -5,7 +5,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import {  useState } from "react";
 import AppBar from "./AppBar/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import Drawer from "./Drawer/Drawer";
@@ -17,6 +17,8 @@ const Layout = () => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+
   const handleToggle = () => {
     setOpen((value) => !value);
   };

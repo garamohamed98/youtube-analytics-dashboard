@@ -5,6 +5,7 @@ import {
   getChannelByTag,
   getChannelByUsername,
   getChannelData,
+  getChannelDataRealTime,
 } from "./channelThunks";
 import type {
   channelDetailsResponse,
@@ -16,6 +17,10 @@ interface initialState {
   searchResult: channelSearchResponse | null;
   data: channelDetailsResponse | null;
   channelId: null | string;
+  autoRefresh: {
+    enabled: boolean;
+    timeoutId: number | null;
+  };
   search: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
@@ -25,6 +30,10 @@ interface initialState {
     error: string | null;
   };
   searchAndLoad: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+  dataRealTime: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
@@ -35,6 +44,10 @@ const initialState: initialState = {
   searchResult: null,
   data: null,
   channelId: null,
+  autoRefresh: {
+    enabled: false,
+    timeoutId: null,
+  },
   search: {
     status: "idle",
     error: null,
@@ -44,6 +57,10 @@ const initialState: initialState = {
     error: null,
   },
   searchAndLoad: {
+    status: "idle",
+    error: null,
+  },
+  dataRealTime: {
     status: "idle",
     error: null,
   },
@@ -67,6 +84,25 @@ const channelSlice = createSlice({
       state.load.error = null;
       state.searchAndLoad.status = "idle";
       state.searchAndLoad.error = null;
+      if (state.autoRefresh.timeoutId) {
+        clearTimeout(state.autoRefresh.timeoutId);
+        state.autoRefresh.timeoutId = null;
+      }
+    },
+    enableAutoRefresh: (state) => {
+      state.autoRefresh.enabled = true;
+    },
+    disableAutoRefresh: (state) => {
+      state.autoRefresh.enabled = false;
+    },
+    setAutoRefreshTimeout: (state, action: PayloadAction<number>) => {
+      state.autoRefresh.timeoutId = action.payload;
+    },
+    clearAutoRefreshTimeout: (state) => {
+      if (state.autoRefresh.timeoutId) {
+        clearTimeout(state.autoRefresh.timeoutId);
+        state.autoRefresh.timeoutId = null;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -163,9 +199,33 @@ const channelSlice = createSlice({
         state.searchAndLoad.status = "failed";
         state.searchAndLoad.error =
           (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelDataRealTime.pending, (state) => {
+        state.dataRealTime.status = "loading";
+      })
+      .addCase(getChannelDataRealTime.fulfilled, (state, action) => {
+        state.dataRealTime.status = "succeeded";
+        state.data = action.payload;
+        if (action.payload.items && action.payload.items.length > 0) {
+          state.channelId = action.payload.items[0].id;
+        } else {
+          state.channelId = null;
+        }
+      })
+      .addCase(getChannelDataRealTime.rejected, (state, action) => {
+        state.dataRealTime.status = "failed";
+        state.dataRealTime.error =
+          (action.payload as string) || "Unknown error";
       });
   },
 });
 
-export const { clearChannelStates, setURL } = channelSlice.actions;
+export const {
+  clearChannelStates,
+  setURL,
+  enableAutoRefresh,
+  disableAutoRefresh,
+  setAutoRefreshTimeout,
+  clearAutoRefreshTimeout,
+} = channelSlice.actions;
 export default channelSlice.reducer;
