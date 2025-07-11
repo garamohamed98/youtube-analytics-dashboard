@@ -6,16 +6,22 @@ import {
   getChannelByUsername,
   getChannelData,
   getChannelDataRealTime,
+  getChannelVideos,
+  getChannelVideosData,
 } from "./channelThunks";
 import type {
   channelDetailsResponse,
   channelSearchResponse,
+  channelVideoData,
+  channelVideosList,
 } from "./channelTypes";
 
 interface initialState {
   URL: null | string;
   searchResult: channelSearchResponse | null;
   data: channelDetailsResponse | null;
+  videosListData: channelVideosList | null;
+  videosDetailsData: channelVideoData[] | null;
   channelId: null | string;
   autoRefresh: {
     enabled: boolean;
@@ -37,6 +43,14 @@ interface initialState {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
+  videosList: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+  videosDetails: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
 }
 
 const initialState: initialState = {
@@ -44,6 +58,8 @@ const initialState: initialState = {
   searchResult: null,
   data: null,
   channelId: null,
+  videosListData: null,
+  videosDetailsData: null,
   autoRefresh: {
     enabled: false,
     timeoutId: null,
@@ -61,6 +77,14 @@ const initialState: initialState = {
     error: null,
   },
   dataRealTime: {
+    status: "idle",
+    error: null,
+  },
+  videosList: {
+    status: "idle",
+    error: null,
+  },
+  videosDetails: {
     status: "idle",
     error: null,
   },
@@ -216,6 +240,28 @@ const channelSlice = createSlice({
         state.dataRealTime.status = "failed";
         state.dataRealTime.error =
           (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelVideos.pending, (state) => {
+        state.videosList.status = "loading";
+      })
+      .addCase(getChannelVideos.fulfilled, (state, action) => {
+        state.videosList.status = "succeeded";
+        state.videosListData = action.payload;
+      })
+      .addCase(getChannelVideos.rejected, (state, action) => {
+        state.videosList.status = "failed";
+        state.videosList.error = (action.payload as string) || "Unknown error";
+      })
+      .addCase(getChannelVideosData.pending, (state) => {
+        state.videosDetails.status = "loading";
+      })
+      .addCase(getChannelVideosData.fulfilled, (state, action) => {
+        state.videosDetails.status = "succeeded";
+        state.videosDetailsData = action.payload;
+      })
+      .addCase(getChannelVideosData.rejected, (state, action) => {
+        state.videosList.status = "failed";
+        state.videosList.error = (action.payload as string) || "Unknown error";
       });
   },
 });

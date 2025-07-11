@@ -9,3 +9,5 @@ export const selectChannelId = (state: RootState) => state.channel.channelId;
 export const selectChannelURL = (state: RootState) => state.channel.URL;
 export const selectChannelAutoRefresh = (state: RootState) =>
   state.channel.autoRefresh;
+export const selectChannelVideosData = (state: RootState) =>
+  state.channel.videosDetailsData;

@@ -7,6 +7,7 @@ import {
   selectChannelSearchAndLoadError,
   selectChannelSearchAndLoadStatus,
   selectChannelURL,
+  selectChannelVideosData,
 } from "../../features/channel/channelSelectors";
 import {
   clearChannelStates,
@@ -17,6 +18,7 @@ import {
 import {
   getChannelData,
   getChannelDataRealTime,
+  getChannelVideosData,
 } from "../../features/channel/channelThunks";
 import extractPath from "../../utils/extractPath";
 import { useCallback, useRef } from "react";
@@ -31,6 +33,7 @@ export const useChannel = () => {
   const channelId = useSelector(selectChannelId);
   const URL = useSelector(selectChannelURL);
   const autoRefresh = useSelector(selectChannelAutoRefresh);
+  const channelVideoData = useSelector(selectChannelVideosData);
 
   const startAutoRefresh = useCallback(
     (interval: number = 300000) => {
@@ -90,6 +93,7 @@ export const useChannel = () => {
       URL,
       query: extractPath(URL)?.path,
       isAutoRefreshEnabled: autoRefresh.enabled,
+      channelVideoData,
     },
     actions: {
       updateUrl: (url: string) => dispatch(setURL(url)),
@@ -97,6 +101,8 @@ export const useChannel = () => {
       clearChannelState: () => dispatch(clearChannelStates()),
       startAutoRefresh,
       stopAutoRefresh,
+      getChannelVideosData: (pageToken: string) =>
+        dispatch(getChannelVideosData({ id: channelId, pageToken })),
     },
   };
 };

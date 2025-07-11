@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 import { useChannel } from "../../hooks/channel/useChannel";
 import CardStatisticsList from "../../components/ui/Dashboard/CardStatisticsList";
 import { useEffect } from "react";
+import VideosTable from "../../components/ui/Dashboard/VideosTable";
 
 const Dashboard = () => {
   const {
@@ -12,7 +13,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     startAutoRefresh();
-    
+
     return () => {
       stopAutoRefresh();
     };
@@ -28,6 +29,9 @@ const Dashboard = () => {
       </Grid>
       <Grid size={{ xs: 12, md: 12 }}>
         <CardStatisticsList />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <VideosTable />
       </Grid>
     </Grid>
   );

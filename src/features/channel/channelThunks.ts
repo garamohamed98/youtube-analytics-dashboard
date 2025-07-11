@@ -4,7 +4,10 @@ import {
   getChannelByIdAPI,
   getChannelByTagAPI,
   getChannelByUsernameAPI,
+  getChannelVideosAPI,
+  getChannelVideosDetailsAPI,
 } from "./channelAPI";
+import type { channelVideoData } from "./channelTypes";
 
 export const getChannelByTag = createAsyncThunk(
   "channel/getChannelByTag",
@@ -120,4 +123,94 @@ export const getChannelData = createAsyncThunk(
 export const getChannelDataRealTime = createAsyncThunk(
   "channel/getChannelDataSilent",
   fetchChannelData
+);
+
+export const getChannelVideos = createAsyncThunk(
+  "channel/getChannelVideos",
+  async (props: { id: string; pageToken: string }, { rejectWithValue }) => {
+    try {
+      if (!props) {
+        return rejectWithValue("No props is provided");
+      }
+      const { id, pageToken } = props;
+      if (!id) {
+        return rejectWithValue("No id is provided");
+      }
+      if (pageToken === null) {
+        return rejectWithValue("No pageToken is provided");
+      }
+      return getChannelVideosAPI(id, pageToken);
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch channel videos");
+    }
+  }
+);
+
+export const getChannelVideosData = createAsyncThunk(
+  "channel/getChannelVideosData",
+  async (
+    props: { id: string | null; pageToken: string | null },
+    { rejectWithValue }
+  ) => {
+    try {
+      console.log("props of the thunk", props);
+
+      if (!props) {
+        return rejectWithValue("No props is provided");
+      }
+      const { id, pageToken } = props;
+      if (!id) {
+        return rejectWithValue("No id is provided");
+      }
+      if (pageToken === null) {
+        return rejectWithValue("No pageToken is provided");
+      }
+      const channelVideosResponse = await getChannelVideosAPI(id, pageToken);
+      console.log("channelVideosResponse: ", channelVideosResponse);
+
+      if (
+        !channelVideosResponse.items ||
+        channelVideosResponse.items.length < 1
+      )
+        return [];
+      const videosIds = channelVideosResponse.items
+        .map((item) => {
+          return item.id.videoId;
+        })
+        .join(",");
+      console.log("videosIds ", videosIds);
+
+      const channelVideosDetailsRespons = await getChannelVideosDetailsAPI(
+        videosIds
+      );
+      console.log("channelVideosDetailsRespons: ", channelVideosDetailsRespons);
+      if (
+        !channelVideosDetailsRespons.items ||
+        channelVideosDetailsRespons.items.length < 1
+      )
+        return [];
+      const videosData = channelVideosDetailsRespons.items.map(
+        (item): channelVideoData => {
+          return {
+            id:item.id,
+            publishedAt: item.snippet.publishedAt,
+            title: item.snippet.title,
+            description: item.snippet.description,
+            thumbnails: {
+              url: item.snippet.thumbnails.default.url,
+              width: item.snippet.thumbnails.default.width,
+              height: item.snippet.thumbnails.default.height,
+            },
+            viewCount: item.statistics.viewCount,
+            likeCount: item.statistics.likeCount,
+            favoriteCount: item.statistics.favoriteCount,
+            commentCount: item.statistics.commentCount,
+          };
+        }
+      );
+      return videosData;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch channel videos");
+    }
+  }
 );
