@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid";
 import { useChannel } from "../../hooks/channel/useChannel";
 import CardStatisticsList from "../../components/ui/Dashboard/CardStatisticsList";
 import { useEffect } from "react";
-import VideosTable from "../../components/ui/Dashboard/VideosTable";
+import VideosTable from "../../components/ui/Dashboard/VideoList";
 
 const Dashboard = () => {
   const {
