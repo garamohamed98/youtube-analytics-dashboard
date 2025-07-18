@@ -2,12 +2,12 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from "../useAppDispatch";
 import {
   selectChannelAutoRefresh,
-  selectChannelData,
+  selectChannelDetails,
+  selectChannelDetailsError,
+  selectChannelDetailsStatus,
   selectChannelId,
-  selectChannelSearchAndLoadError,
-  selectChannelSearchAndLoadStatus,
   selectChannelURL,
-  selectChannelVideosData,
+  selectVideoPaginatedData,
 } from "../../features/channel/channelSelectors";
 import {
   clearChannelStates,
@@ -16,9 +16,9 @@ import {
   setURL,
 } from "../../features/channel/channelSlice";
 import {
-  getChannelData,
-  getChannelDataRealTime,
-  getChannelVideosData,
+  getChannelDetails,
+  getChannelDetailsRealTime,
+  getVideosDetails,
 } from "../../features/channel/channelThunks";
 import extractPath from "../../utils/extractPath";
 import { useCallback, useRef } from "react";
@@ -27,13 +27,13 @@ export const useChannel = () => {
   const dispatch = useAppDispatch();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const data = useSelector(selectChannelData);
-  const searchAndLoardError = useSelector(selectChannelSearchAndLoadError);
-  const searchAndLoadstatus = useSelector(selectChannelSearchAndLoadStatus);
+  const channelDetails = useSelector(selectChannelDetails);
+  const channelDetailsError = useSelector(selectChannelDetailsError);
+  const channelDetailsStatus = useSelector(selectChannelDetailsStatus);
   const channelId = useSelector(selectChannelId);
   const URL = useSelector(selectChannelURL);
   const autoRefresh = useSelector(selectChannelAutoRefresh);
-  const channelVideoData = useSelector(selectChannelVideosData);
+  const videoPaginatedData = useSelector(selectVideoPaginatedData);
 
   const startAutoRefresh = useCallback(
     (interval: number = 300000) => {
@@ -46,7 +46,7 @@ export const useChannel = () => {
         if (URL) {
           const pathData = extractPath(URL);
           if (pathData) {
-            dispatch(getChannelDataRealTime(pathData));
+            dispatch(getChannelDetailsRealTime(pathData));
           }
         }
       }, interval);
@@ -66,13 +66,13 @@ export const useChannel = () => {
     (url: string) => {
       const pathData = extractPath(url);
       if (autoRefresh.enabled === false) {
-        dispatch(getChannelData(pathData));
+        dispatch(getChannelDetails(pathData));
         return;
       }
       stopAutoRefresh();
 
       if (pathData) {
-        dispatch(getChannelData(pathData))
+        dispatch(getChannelDetails(pathData))
           .unwrap()
           .then(() => {
             startAutoRefresh();
@@ -86,14 +86,14 @@ export const useChannel = () => {
 
   return {
     state: {
-      data,
-      searchAndLoardError,
-      searchAndLoadstatus,
+      channelDetails,
+      channelDetailsError,
+      channelDetailsStatus,
       channelId,
       URL,
       query: extractPath(URL)?.path,
       isAutoRefreshEnabled: autoRefresh.enabled,
-      channelVideoData,
+      videoPaginatedData,
     },
     actions: {
       updateUrl: (url: string) => dispatch(setURL(url)),
@@ -102,7 +102,7 @@ export const useChannel = () => {
       startAutoRefresh,
       stopAutoRefresh,
       getChannelVideosData: (pageToken: string) =>
-        dispatch(getChannelVideosData({ id: channelId, pageToken })),
+        dispatch(getVideosDetails({ id: channelId, pageToken })),
     },
   };
 };

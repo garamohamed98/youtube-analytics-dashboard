@@ -2,8 +2,8 @@ import api from "../../services/api.ts";
 import type {
   channelDetailsResponse,
   channelSearchResponse,
-  channelVideosDetails,
-  channelVideosList,
+  videosDetails,
+  videosSummaries,
 } from "./channelTypes.ts";
 
 export const getChannelByTagAPI = async (
@@ -18,6 +18,7 @@ export const getChannelByTagAPI = async (
     },
   });
 
+  console.log("getChannelByTagApi: ", response.data);
   return response.data;
 };
 
@@ -32,6 +33,7 @@ export const getChannelByIdAPI = async (
       timestamp: timestamp || Date.now(),
     },
   });
+  console.log("getChannelByIdAPI: ", response.data);
   return response.data;
 };
 
@@ -46,6 +48,7 @@ export const getChannelByUsernameAPI = async (
       maxResults: 1,
     },
   });
+  console.log("getChannelByUsernamAPI: ", response.data);
   return response.data;
 };
 
@@ -60,13 +63,14 @@ export const getChannelByCustomNameAPI = async (
       maxResults: 1,
     },
   });
+  console.log("getChannelByCustomNameAPI: ", response.data);
   return response.data;
 };
 
 export const getChannelVideosAPI = async (
   id: string,
   pageToken: string
-): Promise<channelVideosList> => {
+): Promise<videosSummaries> => {
   const response = await api.get("/search", {
     params: {
       part: "snippet",
@@ -77,12 +81,13 @@ export const getChannelVideosAPI = async (
       pageToken: pageToken,
     },
   });
+  console.log("getChannelVideosAPI: ", response.data);
   return response.data;
 };
 
 export const getChannelVideosDetailsAPI = async (
   videoIds: string
-): Promise<channelVideosDetails> => {
+): Promise<videosDetails> => {
   console.log("videosIds on api: ", videoIds);
 
   const response = await api.get("/videos", {
@@ -91,5 +96,6 @@ export const getChannelVideosDetailsAPI = async (
       id: videoIds,
     },
   });
+  console.log("getChannelVideosDetailsAPI: ", response.data);
   return response.data;
 };

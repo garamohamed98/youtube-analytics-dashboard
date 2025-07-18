@@ -8,38 +8,31 @@ import {
   useTheme,
 } from "@mui/material";
 import DashboardCard from "../../common/DashboardCard/DashboardCard";
-import { DataGrid, type GridPaginationModel } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import {
+  DataGrid,
+  type GridCallbackDetails,
+  type GridPaginationModel,
+} from "@mui/x-data-grid";
+import { useState } from "react";
 import { useChannel } from "../../../hooks/channel/useChannel";
-import type { channelVideoData } from "../../../features/channel/channelTypes";
+import type { videoGridRow } from "../../../features/channel/channelTypes";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const VideoTable = ({
-  channelVideoData,
-  handleNextPage,
-  handlePreviousPage,
+  videoGridRow,
+  paginationModel,
+  handlePaginationModelChange,
+  totalRow,
 }: {
-  channelVideoData: channelVideoData[] | null;
-  handleNextPage: Function;
-  handlePreviousPage: Function;
+  videoGridRow: videoGridRow[] | null;
+  paginationModel: GridPaginationModel;
+  handlePaginationModelChange: (
+    model: GridPaginationModel,
+    details: GridCallbackDetails<"pagination">
+  ) => void;
+  totalRow: number | null;
 }) => {
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 4,
-  });
-
-  const handlePaginationModelChange = (newModel: GridPaginationModel) => {
-    if (newModel.page > paginationModel.page) {
-      handleNextPage();
-    }
-    if (newModel.page < paginationModel.page) {
-      handlePreviousPage();
-    }
-    setPaginationModel(newModel);
-
-    console.log(newModel);
-  };
   return (
     <DashboardCard filled={true}>
       <CardContent>
@@ -51,10 +44,8 @@ const VideoTable = ({
             slots={{
               columnHeaders: () => null,
             }}
-            //scrollbarSize={0}
-            //disableVirtualization
             paginationMode="server"
-            rowCount={20}
+            rowCount={totalRow ? totalRow : undefined}
             paginationModel={paginationModel}
             onPaginationModelChange={handlePaginationModelChange}
             getRowHeight={() => "auto"}
@@ -129,7 +120,7 @@ const VideoTable = ({
                 ),
               },
             ]}
-            rows={channelVideoData ? channelVideoData : []}
+            rows={videoGridRow ? videoGridRow : []}
             pageSizeOptions={[4]}
             getRowId={(row) => row.id}
           />
@@ -140,15 +131,19 @@ const VideoTable = ({
 };
 
 const VideoCard = ({
-  channelVideoData,
+  videoGridRow,
   handleNextPage,
   handlePreviousPage,
+  paginationModel,
+  totalRow,
 }: {
-  channelVideoData: channelVideoData[] | null;
+  videoGridRow: videoGridRow[] | null;
   handleNextPage: Function;
   handlePreviousPage: Function;
+  paginationModel: GridPaginationModel;
+  totalRow: number | null;
 }) => {
-  if (!channelVideoData) {
+  if (!videoGridRow) {
     return <Box>No videos</Box>;
   }
   return (
@@ -157,9 +152,9 @@ const VideoCard = ({
         Video Metrics List
       </Typography>
       <Box display={"flex"} flexDirection="column" gap="20px">
-        {channelVideoData.map((video) => {
+        {videoGridRow?.map((video) => {
           return (
-            <DashboardCard>
+            <DashboardCard key={video.id}>
               <CardContent>
                 <Box display="flex" flexDirection="column" gap="20px">
                   <Box
@@ -238,11 +233,32 @@ const VideoCard = ({
         alignItems="center"
         p="10px"
       >
-        <IconButton>
+        <IconButton
+          onClick={() => {
+            handlePreviousPage();
+          }}
+          disabled={paginationModel.page <= 0}
+        >
           <ArrowBackIosNewIcon />
         </IconButton>
-        1-4 of 20
-        <IconButton>
+        {totalRow
+          ? `${paginationModel.page * paginationModel.pageSize + 1}-${
+              paginationModel.page * paginationModel.pageSize + 4 > totalRow
+                ? totalRow
+                : paginationModel.page * paginationModel.pageSize + 4
+            } of ${totalRow}`
+          : "0"}
+        <IconButton
+          onClick={() => {
+            handleNextPage();
+          }}
+          disabled={
+            totalRow
+              ? (paginationModel.page + 1) * paginationModel.pageSize >=
+                totalRow
+              : true
+          }
+        >
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
@@ -252,34 +268,76 @@ const VideoCard = ({
 
 const VideoList = () => {
   const {
-    state: { channelVideoData, URL },
+    state: { videoPaginatedData },
     actions: { getChannelVideosData },
   } = useChannel();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  useEffect(() => {
-    getChannelVideosData("");
-  }, [URL]);
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 4,
+  });
+  console.log("pagination model", paginationModel);
 
-  const handleNextPage = () => {};
+  const handleNextPage = () => {
+    setPaginationModel((paginationModel) => ({
+      ...paginationModel,
+      page: paginationModel.page + 1,
+    }));
+    if (videoPaginatedData?.nextPageToken) {
+      getChannelVideosData(videoPaginatedData.nextPageToken);
+    }
+  };
 
-  const handlePreviousPage = () => {};
+  const handlePreviousPage = () => {
+    setPaginationModel((paginationModel) => ({
+      ...paginationModel,
+      page: paginationModel.page - 1,
+    }));
+
+    if (videoPaginatedData?.prevPageToken) {
+      getChannelVideosData(videoPaginatedData.prevPageToken);
+    }
+  };
+
+  const handlePaginationModelChange = (newModel: GridPaginationModel) => {
+    if (
+      newModel.page > paginationModel.page &&
+      videoPaginatedData?.nextPageToken
+    ) {
+      getChannelVideosData(videoPaginatedData.nextPageToken);
+    }
+    if (
+      newModel.page < paginationModel.page &&
+      videoPaginatedData?.prevPageToken
+    ) {
+      getChannelVideosData(videoPaginatedData.prevPageToken);
+    }
+    setPaginationModel(newModel);
+  };
 
   if (isMobile) {
     return (
       <VideoCard
-        channelVideoData={channelVideoData}
+        videoGridRow={
+          videoPaginatedData ? videoPaginatedData.videoGridRow : null
+        }
         handleNextPage={handleNextPage}
         handlePreviousPage={handlePreviousPage}
+        paginationModel={paginationModel}
+        totalRow={videoPaginatedData ? videoPaginatedData.totalResults : null}
       />
     );
   } else {
     return (
       <VideoTable
-        channelVideoData={channelVideoData}
-        handleNextPage={handleNextPage}
-        handlePreviousPage={handlePreviousPage}
+        videoGridRow={
+          videoPaginatedData ? videoPaginatedData.videoGridRow : null
+        }
+        paginationModel={paginationModel}
+        handlePaginationModelChange={handlePaginationModelChange}
+        totalRow={videoPaginatedData ? videoPaginatedData.totalResults : null}
       />
     );
   }

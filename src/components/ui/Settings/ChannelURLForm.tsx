@@ -8,7 +8,7 @@ const YOUTUBE_CHANNEL_URL_REGEX =
 
 const ChannelURLForm = () => {
   const {
-    state: { searchAndLoadstatus, searchAndLoardError, channelId, URL },
+    state: { channelDetailsStatus, channelDetailsError, channelId, URL },
     actions: { updateUrl, fetchChannel, clearChannelState },
   } = useChannel();
   const [url, setUrl] = useState(URL);
@@ -18,11 +18,11 @@ const ChannelURLForm = () => {
   const getHelperText = () => {
     if (!url) return "Enter youtube channel URL";
     if (URLError) return "Invalid Youtube channel URL";
-    if (searchAndLoadstatus === "loading") return "loading...";
-    if (searchAndLoadstatus === "failed") return searchAndLoardError;
-    if (searchAndLoadstatus === "succeeded" && channelId)
+    if (channelDetailsStatus === "loading") return "loading...";
+    if (channelDetailsStatus === "failed") return channelDetailsError;
+    if (channelDetailsStatus === "succeeded" && channelId)
       return `Channel ID: ${channelId}`;
-    if (searchAndLoadstatus === "idle") return `Enter youtube channel URL`;
+    if (channelDetailsStatus === "idle") return `Enter youtube channel URL`;
   };
 
   useEffect(() => {

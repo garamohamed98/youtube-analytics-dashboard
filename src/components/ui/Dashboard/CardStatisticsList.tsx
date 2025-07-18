@@ -5,15 +5,15 @@ import { useChannel } from "../../../hooks/channel/useChannel";
 
 const CardStatisticsList = () => {
   const {
-    state: { data },
+    state: { channelDetails },
   } = useChannel();
 
-  const viewCount = `${Number(data?.items[0]?.statistics.viewCount) / 1000}k`;
+  const viewCount = `${Number(channelDetails?.items[0]?.statistics.viewCount) / 1000}k`;
   const subscriberCount =
-    data?.items[0]?.statistics.hiddenSubscriberCount === true
+    channelDetails?.items[0]?.statistics.hiddenSubscriberCount === true
       ? "subscriber are hiden"
-      : `${Number(data?.items[0]?.statistics.subscriberCount) / 1000}k`;
-  const videoCount = data?.items[0]?.statistics.videoCount;
+      : `${Number(channelDetails?.items[0]?.statistics.subscriberCount) / 1000}k`;
+  const videoCount = channelDetails?.items[0]?.statistics.videoCount;
 
   return (
     <Grid container spacing={2} alignItems="center">
@@ -24,7 +24,7 @@ const CardStatisticsList = () => {
               View Count
             </Typography>
             <Typography variant="h2">
-              {!!data?.items[0]?.statistics.viewCount && viewCount}
+              {!!channelDetails?.items[0]?.statistics.viewCount && viewCount}
             </Typography>
           </CardContent>
         </DashboardCard>
@@ -36,7 +36,7 @@ const CardStatisticsList = () => {
               Subscriber Count
             </Typography>
             <Typography variant="h2">
-              {!!data?.items[0]?.statistics.subscriberCount &&
+              {!!channelDetails?.items[0]?.statistics.subscriberCount &&
                 subscriberCount}
             </Typography>
           </CardContent>
@@ -49,7 +49,7 @@ const CardStatisticsList = () => {
               Video Count
             </Typography>
             <Typography variant="h2">
-              {!!data?.items[0]?.statistics.videoCount && videoCount}
+              {!!channelDetails?.items[0]?.statistics.videoCount && videoCount}
             </Typography>
           </CardContent>
         </DashboardCard>

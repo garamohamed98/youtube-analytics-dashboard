@@ -7,65 +7,9 @@ import {
   getChannelVideosAPI,
   getChannelVideosDetailsAPI,
 } from "./channelAPI";
-import type { channelVideoData } from "./channelTypes";
+import type { videoGridRow } from "./channelTypes";
 
-export const getChannelByTag = createAsyncThunk(
-  "channel/getChannelByTag",
-  async (tag: string, { rejectWithValue }) => {
-    try {
-      if (!tag) {
-        return rejectWithValue("No parameter is provided");
-      }
-      return await getChannelByTagAPI(tag);
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel");
-    }
-  }
-);
-
-export const getChannelById = createAsyncThunk(
-  "channel/getChannelById",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      if (!id) {
-        return rejectWithValue("No parameter is provided");
-      }
-      return await getChannelByIdAPI(id);
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel");
-    }
-  }
-);
-
-export const getChannelByUsername = createAsyncThunk(
-  "channel/getChannelByUsername",
-  async (username: string, { rejectWithValue }) => {
-    try {
-      if (!username) {
-        return rejectWithValue("No parameter is provided");
-      }
-      return await getChannelByUsernameAPI(username);
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel");
-    }
-  }
-);
-
-export const getChannelByCustomName = createAsyncThunk(
-  "channel/getChannelByCustomName",
-  async (customName: string, { rejectWithValue }) => {
-    try {
-      if (!customName) {
-        return rejectWithValue("No parameter is provided");
-      }
-      return await getChannelByCustomNameAPI(customName);
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel");
-    }
-  }
-);
-
-const fetchChannelData = async (
+const fetchChannelDetails = async (
   props: { format: string; path: string } | null,
   { rejectWithValue }: { rejectWithValue: (value: any) => any }
 ) => {
@@ -115,46 +59,23 @@ const fetchChannelData = async (
   }
 };
 
-export const getChannelData = createAsyncThunk(
-  "channel/getChannelData",
-  fetchChannelData
+export const getChannelDetails = createAsyncThunk(
+  "channel/getChannelDetails",
+  fetchChannelDetails
 );
 
-export const getChannelDataRealTime = createAsyncThunk(
-  "channel/getChannelDataSilent",
-  fetchChannelData
+export const getChannelDetailsRealTime = createAsyncThunk(
+  "channel/getChannelDetailsRealTime",
+  fetchChannelDetails
 );
 
-export const getChannelVideos = createAsyncThunk(
-  "channel/getChannelVideos",
-  async (props: { id: string; pageToken: string }, { rejectWithValue }) => {
-    try {
-      if (!props) {
-        return rejectWithValue("No props is provided");
-      }
-      const { id, pageToken } = props;
-      if (!id) {
-        return rejectWithValue("No id is provided");
-      }
-      if (pageToken === null) {
-        return rejectWithValue("No pageToken is provided");
-      }
-      return getChannelVideosAPI(id, pageToken);
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch channel videos");
-    }
-  }
-);
-
-export const getChannelVideosData = createAsyncThunk(
-  "channel/getChannelVideosData",
+export const getVideosDetails = createAsyncThunk(
+  "channel/getVideosDetails",
   async (
     props: { id: string | null; pageToken: string | null },
     { rejectWithValue }
   ) => {
     try {
-      console.log("props of the thunk", props);
-
       if (!props) {
         return rejectWithValue("No props is provided");
       }
@@ -166,40 +87,47 @@ export const getChannelVideosData = createAsyncThunk(
         return rejectWithValue("No pageToken is provided");
       }
       const channelVideosResponse = await getChannelVideosAPI(id, pageToken);
-      console.log("channelVideosResponse: ", channelVideosResponse);
 
       if (
         !channelVideosResponse.items ||
         channelVideosResponse.items.length < 1
       )
-        return [];
+        return {
+          videoGridRow: [],
+          nextPageToken: null,
+          prevPageToken: null,
+          totalResults: null,
+        };
       const videosIds = channelVideosResponse.items
         .map((item) => {
           return item.id.videoId;
         })
         .join(",");
-      console.log("videosIds ", videosIds);
 
       const channelVideosDetailsRespons = await getChannelVideosDetailsAPI(
         videosIds
       );
-      console.log("channelVideosDetailsRespons: ", channelVideosDetailsRespons);
       if (
         !channelVideosDetailsRespons.items ||
         channelVideosDetailsRespons.items.length < 1
       )
-        return [];
-      const videosData = channelVideosDetailsRespons.items.map(
-        (item): channelVideoData => {
+        return {
+          videoGridRow: [],
+          nextPageToken: null,
+          prevPageToken: null,
+          totalResults: null,
+        };
+      const videosDetails = channelVideosDetailsRespons.items.map(
+        (item): videoGridRow => {
           return {
-            id:item.id,
+            id: item.id,
             publishedAt: item.snippet.publishedAt,
             title: item.snippet.title,
             description: item.snippet.description,
             thumbnails: {
-              url: item.snippet.thumbnails.default.url,
-              width: item.snippet.thumbnails.default.width,
-              height: item.snippet.thumbnails.default.height,
+              url: item.snippet.thumbnails.maxres.url,
+              width: item.snippet.thumbnails.maxres.width,
+              height: item.snippet.thumbnails.maxres.height,
             },
             viewCount: item.statistics.viewCount,
             likeCount: item.statistics.likeCount,
@@ -208,7 +136,18 @@ export const getChannelVideosData = createAsyncThunk(
           };
         }
       );
-      return videosData;
+      return {
+        videoGridRow: videosDetails,
+        nextPageToken: channelVideosResponse.nextPageToken
+          ? channelVideosResponse.nextPageToken
+          : null,
+        prevPageToken: channelVideosResponse.prevPageToken
+          ? channelVideosResponse.prevPageToken
+          : null,
+        totalResults: channelVideosResponse.pageInfo.totalResults
+          ? channelVideosResponse.pageInfo.totalResults
+          : null,
+      };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch channel videos");
     }

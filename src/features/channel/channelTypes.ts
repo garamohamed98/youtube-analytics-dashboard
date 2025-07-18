@@ -26,10 +26,11 @@ export interface channelDetailsResponse {
   ];
 }
 
-export interface channelVideosList {
+export interface videosSummaries {
   kind: string;
   etag: string;
-  nexPatgeToken: string;
+  nextPageToken: string;
+  prevPageToken: string;
   pageInfo: {
     totalResults: number;
     resultsPerPage: number;
@@ -48,21 +49,21 @@ export interface channelVideosList {
         title: string;
         description: string;
         thumbnails: {
-          default: {
+          maxres: {
             url: string;
-            width: 120;
-            height: 90;
+            width: number;
+            height: number;
           };
         };
-        channelTitle: "Jay Aliyev";
-        liveBroadcastContent: "none";
-        publishTime: "2025-06-27T13:01:37Z";
+        channelTitle: string;
+        liveBroadcastContent: string;
+        publishTime: string;
       };
     }
   ];
 }
 
-export interface channelVideosDetails {
+export interface videosDetails {
   kind: string;
   etag: string;
   items: [
@@ -76,7 +77,7 @@ export interface channelVideosDetails {
         title: string;
         description: string;
         thumbnails: {
-          default: {
+          maxres: {
             url: string;
             width: number;
             height: number;
@@ -112,7 +113,7 @@ export interface channelVideosDetails {
   };
 }
 
-export interface channelVideoData {
+export interface videoGridRow {
   id: string;
   publishedAt: string;
   title: string;
@@ -126,4 +127,11 @@ export interface channelVideoData {
   likeCount: string;
   favoriteCount: string;
   commentCount: string;
+}
+
+export interface videoPaginatedData {
+  videoGridRow: videoGridRow[];
+  nextPageToken: string | null;
+  prevPageToken: string | null;
+  totalResults: number | null
 }
