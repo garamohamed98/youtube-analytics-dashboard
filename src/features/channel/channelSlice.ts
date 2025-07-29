@@ -3,6 +3,7 @@ import {
   getChannelDetails,
   getChannelDetailsRealTime,
   getVideosDetails,
+  getVideosDetailsRealTime,
 } from "./channelThunks";
 import type {
   channelDetailsResponse,
@@ -30,6 +31,10 @@ interface initialState {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
+  videoPaginatedRealTimeDataStatus: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
 }
 
 const initialState: initialState = {
@@ -50,6 +55,10 @@ const initialState: initialState = {
     error: null,
   },
   videoPaginatedDataStatus: {
+    status: "idle",
+    error: null,
+  },
+  videoPaginatedRealTimeDataStatus: {
     status: "idle",
     error: null,
   },
@@ -136,6 +145,18 @@ const channelSlice = createSlice({
         state.videoPaginatedDataStatus.status = "failed";
         state.videoPaginatedDataStatus.error =
           (action.payload as string) || "Unknown error";
+      })
+      .addCase(getVideosDetailsRealTime.pending, (state) => {
+        state.videoPaginatedRealTimeDataStatus.status = "loading";
+      })
+      .addCase(getVideosDetailsRealTime.fulfilled, (state, action) => {
+        state.videoPaginatedRealTimeDataStatus.status = "succeeded";
+        state.videoPaginatedData = action.payload;
+      })
+      .addCase(getVideosDetailsRealTime.rejected, (state, action) => {
+        state.videoPaginatedRealTimeDataStatus.status = "failed";
+        state.videoPaginatedRealTimeDataStatus.error =
+          (action.payload as string) || "Unkown error";
       });
   },
 });

@@ -271,6 +271,7 @@ const VideoList = () => {
     state: { videoPaginatedData },
     actions: { getChannelVideosData },
   } = useChannel();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -278,7 +279,6 @@ const VideoList = () => {
     page: 0,
     pageSize: 4,
   });
-  console.log("pagination model", paginationModel);
 
   const handleNextPage = () => {
     setPaginationModel((paginationModel) => ({

@@ -132,6 +132,7 @@ export interface videoGridRow {
 export interface videoPaginatedData {
   videoGridRow: videoGridRow[];
   nextPageToken: string | null;
+  currentPageToken: string | null;
   prevPageToken: string | null;
-  totalResults: number | null
+  totalResults: number | null;
 }

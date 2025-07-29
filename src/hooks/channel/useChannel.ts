@@ -19,9 +19,10 @@ import {
   getChannelDetails,
   getChannelDetailsRealTime,
   getVideosDetails,
+  getVideosDetailsRealTime,
 } from "../../features/channel/channelThunks";
 import extractPath from "../../utils/extractPath";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export const useChannel = () => {
   const dispatch = useAppDispatch();
@@ -35,23 +36,55 @@ export const useChannel = () => {
   const autoRefresh = useSelector(selectChannelAutoRefresh);
   const videoPaginatedData = useSelector(selectVideoPaginatedData);
 
+  const currentValuesRef = useRef({
+    videoPaginatedData,
+    channelId,
+    URL,
+    autoRefresh,
+  });
+
+  useEffect(() => {
+    currentValuesRef.current = {
+      videoPaginatedData,
+      channelId,
+      URL,
+      autoRefresh,
+    };
+  }, [videoPaginatedData, channelId, URL, autoRefresh]);
+
   const startAutoRefresh = useCallback(
-    (interval: number = 300000) => {
-      // I set the intervall too big i have limited use of youtube api v3 in every day
+    (interval: number = 30000) => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       dispatch(enableAutoRefresh());
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = setInterval(async () => {
+        const { videoPaginatedData, channelId, URL } = currentValuesRef.current;
         if (URL) {
           const pathData = extractPath(URL);
           if (pathData) {
-            dispatch(getChannelDetailsRealTime(pathData));
+            const resultChannelDetails = await dispatch(
+              getChannelDetailsRealTime(pathData)
+            );
+            if (
+              getChannelDetailsRealTime.fulfilled.match(resultChannelDetails) &&
+              resultChannelDetails.payload.items &&
+              resultChannelDetails.payload.items.length > 0
+            ) {
+              dispatch(
+                getVideosDetailsRealTime({
+                  id: channelId,
+                  pageToken: videoPaginatedData?.currentPageToken
+                    ? videoPaginatedData.currentPageToken
+                    : "",
+                })
+              );
+            }
           }
         }
       }, interval);
     },
-    [dispatch, URL]
+    [dispatch]
   );
 
   const stopAutoRefresh = useCallback(() => {
@@ -63,25 +96,39 @@ export const useChannel = () => {
   }, [dispatch]);
 
   const fetchChannel = useCallback(
-    (url: string) => {
+    async (url: string) => {
       const pathData = extractPath(url);
-      if (autoRefresh.enabled === false) {
-        dispatch(getChannelDetails(pathData));
-        return;
+      if (!pathData) return;
+      if (autoRefresh.enabled) {
+        stopAutoRefresh();
       }
-      stopAutoRefresh();
+      try {
+        const resultChannelDetails = await dispatch(
+          getChannelDetails(pathData)
+        );
 
-      if (pathData) {
-        dispatch(getChannelDetails(pathData))
-          .unwrap()
-          .then(() => {
-            startAutoRefresh();
-          });
-        return;
+        await dispatch(
+          getVideosDetails({
+            id: resultChannelDetails.payload.items[0].id,
+            pageToken: "",
+          })
+        );
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      } finally {
+        if (autoRefresh.enabled) {
+          startAutoRefresh();
+        }
       }
       return;
     },
-    [dispatch, stopAutoRefresh, startAutoRefresh, autoRefresh.enabled]
+    [
+      dispatch,
+      stopAutoRefresh,
+      startAutoRefresh,
+      autoRefresh.enabled,
+      channelId,
+    ]
   );
 
   return {
