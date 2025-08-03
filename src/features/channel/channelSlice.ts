@@ -1,39 +1,37 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
-  getChannelByCustomName,
-  getChannelById,
-  getChannelByTag,
-  getChannelByUsername,
-  getChannelData,
-  getChannelDataRealTime,
+  getChannelDetails,
+  getChannelDetailsRealTime,
+  getVideosDetails,
+  getVideosDetailsRealTime,
 } from "./channelThunks";
 import type {
   channelDetailsResponse,
-  channelSearchResponse,
+  videoPaginatedData,
 } from "./channelTypes";
 
 interface initialState {
   URL: null | string;
-  searchResult: channelSearchResponse | null;
-  data: channelDetailsResponse | null;
+  channelDetails: channelDetailsResponse | null;
+  videoPaginatedData: videoPaginatedData | null;
   channelId: null | string;
   autoRefresh: {
     enabled: boolean;
     timeoutId: number | null;
   };
-  search: {
+  channelDetailsStatus: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
-  load: {
+  channelDetailsRealTimeStatus: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
-  searchAndLoad: {
+  videoPaginatedDataStatus: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
-  dataRealTime: {
+  videoPaginatedRealTimeDataStatus: {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
@@ -41,26 +39,26 @@ interface initialState {
 
 const initialState: initialState = {
   URL: null,
-  searchResult: null,
-  data: null,
+  channelDetails: null,
   channelId: null,
+  videoPaginatedData: null,
   autoRefresh: {
     enabled: false,
     timeoutId: null,
   },
-  search: {
+  channelDetailsStatus: {
     status: "idle",
     error: null,
   },
-  load: {
+  channelDetailsRealTimeStatus: {
     status: "idle",
     error: null,
   },
-  searchAndLoad: {
+  videoPaginatedDataStatus: {
     status: "idle",
     error: null,
   },
-  dataRealTime: {
+  videoPaginatedRealTimeDataStatus: {
     status: "idle",
     error: null,
   },
@@ -75,15 +73,10 @@ const channelSlice = createSlice({
     },
     clearChannelStates: (state) => {
       state.URL = null;
-      state.searchResult = null;
-      state.data = null;
+      state.channelDetails = null;
       state.channelId = null;
-      state.search.status = "idle";
-      state.search.error = null;
-      state.load.status = "idle";
-      state.load.error = null;
-      state.searchAndLoad.status = "idle";
-      state.searchAndLoad.error = null;
+      state.channelDetailsStatus.status = "idle";
+      state.channelDetailsStatus.error = null;
       if (state.autoRefresh.timeoutId) {
         clearTimeout(state.autoRefresh.timeoutId);
         state.autoRefresh.timeoutId = null;
@@ -107,115 +100,63 @@ const channelSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getChannelByTag.pending, (state) => {
-        state.search.status = "loading";
+      .addCase(getChannelDetails.pending, (state) => {
+        state.channelDetailsStatus.status = "loading";
       })
-      .addCase(getChannelByTag.fulfilled, (state, action) => {
-        state.search.status = "succeeded";
-        state.searchResult = action.payload;
-        if (
-          action.payload.items &&
-          action.payload.items.length > 0 &&
-          action.payload.items[0].id
-        ) {
-          state.channelId = action.payload.items[0].id.channelId;
-        } else {
-          state.channelId = null;
-        }
-      })
-      .addCase(getChannelByTag.rejected, (state, action) => {
-        state.search.status = "failed";
-        state.search.error = (action.payload as string) || "Unknown error";
-      })
-      .addCase(getChannelById.pending, (state) => {
-        state.load.status = "loading";
-      })
-      .addCase(getChannelById.fulfilled, (state, action) => {
-        state.load.status = "succeeded";
-        state.data = action.payload;
+      .addCase(getChannelDetails.fulfilled, (state, action) => {
+        state.channelDetailsStatus.status = "succeeded";
+        state.channelDetails = action.payload;
         if (action.payload.items && action.payload.items.length > 0) {
           state.channelId = action.payload.items[0].id;
         } else {
           state.channelId = null;
         }
       })
-      .addCase(getChannelById.rejected, (state, action) => {
-        state.load.status = "failed";
-        state.load.error = (action.payload as string) || "Unknown error";
-      })
-      .addCase(getChannelByUsername.pending, (state) => {
-        state.search.status = "loading";
-      })
-      .addCase(getChannelByUsername.fulfilled, (state, action) => {
-        state.search.status = "succeeded";
-        state.searchResult = action.payload;
-        if (
-          action.payload.items &&
-          action.payload.items.length > 0 &&
-          action.payload.items[0].id
-        ) {
-          state.channelId = action.payload.items[0].id.channelId;
-        } else {
-          state.channelId = null;
-        }
-      })
-      .addCase(getChannelByUsername.rejected, (state, action) => {
-        state.search.status = "failed";
-        state.search.error = (action.payload as string) || "Unknown error";
-      })
-      .addCase(getChannelByCustomName.pending, (state) => {
-        state.search.status = "loading";
-      })
-      .addCase(getChannelByCustomName.fulfilled, (state, action) => {
-        state.search.status = "succeeded";
-        state.searchResult = action.payload;
-        if (
-          action.payload.items &&
-          action.payload.items.length > 0 &&
-          action.payload.items[0].id
-        ) {
-          state.channelId = action.payload.items[0].id.channelId;
-        } else {
-          state.channelId = null;
-        }
-      })
-      .addCase(getChannelByCustomName.rejected, (state, action) => {
-        state.search.status = "failed";
-        state.search.error = (action.payload as string) || "Unknown error";
-      })
-      .addCase(getChannelData.pending, (state) => {
-        state.searchAndLoad.status = "loading";
-      })
-      .addCase(getChannelData.fulfilled, (state, action) => {
-        state.searchAndLoad.status = "succeeded";
-        state.data = action.payload;
-        if (action.payload.items && action.payload.items.length > 0) {
-          state.channelId = action.payload.items[0].id;
-        } else {
-          state.channelId = null;
-        }
-      })
-      .addCase(getChannelData.rejected, (state, action) => {
-        state.searchAndLoad.status = "failed";
-        state.searchAndLoad.error =
+      .addCase(getChannelDetails.rejected, (state, action) => {
+        state.channelDetailsStatus.status = "failed";
+        state.channelDetailsStatus.error =
           (action.payload as string) || "Unknown error";
       })
-      .addCase(getChannelDataRealTime.pending, (state) => {
-        state.dataRealTime.status = "loading";
+      .addCase(getChannelDetailsRealTime.pending, (state) => {
+        state.channelDetailsRealTimeStatus.status = "loading";
       })
-      .addCase(getChannelDataRealTime.fulfilled, (state, action) => {
-        state.dataRealTime.status = "succeeded";
-        state.data = action.payload;
+      .addCase(getChannelDetailsRealTime.fulfilled, (state, action) => {
+        state.channelDetailsRealTimeStatus.status = "succeeded";
+        state.channelDetails = action.payload;
         if (action.payload.items && action.payload.items.length > 0) {
           state.channelId = action.payload.items[0].id;
         } else {
           state.channelId = null;
         }
       })
-      .addCase(getChannelDataRealTime.rejected, (state, action) => {
-        state.dataRealTime.status = "failed";
-        state.dataRealTime.error =
+      .addCase(getChannelDetailsRealTime.rejected, (state, action) => {
+        state.channelDetailsRealTimeStatus.status = "failed";
+        state.channelDetailsRealTimeStatus.error =
           (action.payload as string) || "Unknown error";
+      })
+      .addCase(getVideosDetails.pending, (state) => {
+        state.videoPaginatedDataStatus.status = "loading";
+      })
+      .addCase(getVideosDetails.fulfilled, (state, action) => {
+        state.videoPaginatedDataStatus.status = "succeeded";
+        state.videoPaginatedData = action.payload;
+      })
+      .addCase(getVideosDetails.rejected, (state, action) => {
+        state.videoPaginatedDataStatus.status = "failed";
+        state.videoPaginatedDataStatus.error =
+          (action.payload as string) || "Unknown error";
+      })
+      .addCase(getVideosDetailsRealTime.pending, (state) => {
+        state.videoPaginatedRealTimeDataStatus.status = "loading";
+      })
+      .addCase(getVideosDetailsRealTime.fulfilled, (state, action) => {
+        state.videoPaginatedRealTimeDataStatus.status = "succeeded";
+        state.videoPaginatedData = action.payload;
+      })
+      .addCase(getVideosDetailsRealTime.rejected, (state, action) => {
+        state.videoPaginatedRealTimeDataStatus.status = "failed";
+        state.videoPaginatedRealTimeDataStatus.error =
+          (action.payload as string) || "Unkown error";
       });
   },
 });

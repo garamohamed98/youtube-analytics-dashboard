@@ -15,6 +15,13 @@ declare module "@mui/material/styles" {
   interface ThemeOptions {
     drawerWidth?: number;
   }
+  interface Components {
+    MuiDataGrid?: {
+      styleOverrides?: {
+        root?: any;
+      };
+    };
+  }
 }
 
 const drawerWidth = 240;
@@ -119,6 +126,53 @@ export const themeSettings = (mode: PaletteMode): ThemeOptions => {
             color: "#999aa0",
             "&:hover": {
               backgroundColor: "#eaebf2",
+            },
+          },
+        },
+      },
+      MuiDataGrid: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "transparent",
+            color: "#999aa0",
+            border: "none",
+            height: 420,
+            "& .MuiDataGrid-cell": {
+              borderLeft: "none",
+              borderRight: "none",
+              borderTop: "none",
+              borderBottom: "0.5px solid #999aa0 !important",
+              padding: "10px",
+            },
+            "& .MuiDataGrid-row": {
+              border: "none",
+              backgroundColor: "transparent",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              borderBottom: "0.5px solid #999aa0",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "transparent",
+            },
+            "& .MuiDataGrid-columnSeparator": {
+              display: "none",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-overlay": {
+              backgroundColor: "transparent",
+            },
+            "& .MuiDataGrid-filler ": {
+              backgroundColor: "transparent !important",
+            },
+            "& .MuiTablePagination-displayedRows": {
+              color: "#999aa0",
+            },
+            "& .MuiDataGrid-scrollbar": {
+              scrollbarWidth: "none !important",
+              msOverflowStyle: "none !important",
             },
           },
         },
