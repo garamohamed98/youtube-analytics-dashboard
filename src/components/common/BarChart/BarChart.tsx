@@ -51,7 +51,14 @@ const BarChart = ({
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: theme.palette.text.secondary },
+            ticks: {
+              color: theme.palette.text.secondary,
+              maxRotation: 45,
+              minRotation: 60,
+              font: {
+                size: 9,
+              },
+            },
           },
           y: {
             beginAtZero: true,
