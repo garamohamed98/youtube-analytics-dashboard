@@ -13,6 +13,10 @@ const VideoViewsChart = () => {
   });
 
   const labels = videoPaginatedData?.videoGridRow.map((video) => {
+    return video.publishedAt.split("T")[0].split("-").slice(-2).join("/");
+  });
+
+  const tooltip = videoPaginatedData?.videoGridRow.map((video) => {
     return video.title;
   });
 
@@ -27,6 +31,7 @@ const VideoViewsChart = () => {
             data={data ? data : []}
             labels={labels ? labels : []}
             label="views"
+            tooltip={tooltip ? tooltip : []}
           />
         </Box>
       </CardContent>

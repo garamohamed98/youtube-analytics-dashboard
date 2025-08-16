@@ -14,10 +14,12 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 const BarChart = ({
   data,
   labels,
+  tooltip,
   label,
 }: {
   data: number[];
   labels: string[];
+  tooltip: string[];
   label: string;
 }) => {
   const theme = useTheme();
@@ -47,16 +49,22 @@ const BarChart = ({
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function (context) {
+                const index = context[0].dataIndex;
+                return tooltip[index];
+              },
+            },
+          },
         },
         scales: {
           x: {
             grid: { display: false },
             ticks: {
               color: theme.palette.text.secondary,
-              maxRotation: 45,
-              minRotation: 60,
               font: {
-                size: 9,
+                size: 10,
               },
             },
           },
