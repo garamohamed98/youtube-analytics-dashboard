@@ -1,0 +1,90 @@
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useTheme } from "@mui/material";
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
+const BarChart = ({
+  data,
+  labels,
+  tooltip,
+  label,
+}: {
+  data: number[];
+  labels: string[];
+  tooltip: string[];
+  label: string;
+}) => {
+  const theme = useTheme();
+  return (
+    <Bar
+      data={{
+        labels: labels,
+        datasets: [
+          {
+            label: label,
+            data: data,
+            backgroundColor: (ctx) => {
+              const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+              gradient.addColorStop(0, theme.palette.primary.dark);
+              gradient.addColorStop(1, theme.palette.primary.main);
+              return gradient;
+            },
+            borderColor: theme.palette.primary.light,
+            borderWidth: 2,
+            borderRadius: 8,
+            barPercentage: 0.7,
+          },
+        ],
+      }}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function (context) {
+                const index = context[0].dataIndex;
+                return tooltip[index];
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: theme.palette.text.secondary,
+              font: {
+                size: 10,
+              },
+            },
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: theme.palette.background.default,
+            },
+            ticks: {
+              color: theme.palette.text.secondary,
+            },
+          },
+        },
+        animation: {
+          duration: 1500,
+          easing: "easeInOutQuart",
+        },
+      }}
+    />
+  );
+};
+
+export default BarChart;

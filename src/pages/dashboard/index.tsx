@@ -4,10 +4,11 @@ import { useChannel } from "../../hooks/channel/useChannel";
 import CardStatisticsList from "../../components/ui/Dashboard/CardStatisticsList";
 import { useEffect } from "react";
 import VideosTable from "../../components/ui/Dashboard/VideoList";
+import VideoViewsChart from "../../components/ui/Dashboard/VideoViewsChart";
 
 const Dashboard = () => {
   const {
-    state: { searchAndLoadstatus, searchAndLoardError },
+    state: { channelDetailsStatus, channelDetailsError },
     actions: { startAutoRefresh, stopAutoRefresh },
   } = useChannel();
 
@@ -19,8 +20,8 @@ const Dashboard = () => {
     };
   }, []);
 
-  if (searchAndLoadstatus === "failed")
-    return <Box>error: {searchAndLoardError}</Box>;
+  if (channelDetailsStatus === "failed")
+    return <Box>error: {channelDetailsError}</Box>;
 
   return (
     <Grid container spacing={2} alignItems="center">
@@ -29,6 +30,9 @@ const Dashboard = () => {
       </Grid>
       <Grid size={{ xs: 12, md: 12 }}>
         <CardStatisticsList />
+      </Grid>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <VideoViewsChart />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <VideosTable />
