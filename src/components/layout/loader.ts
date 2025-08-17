@@ -7,7 +7,7 @@ import {
 import extractQuery from "../../utils/extractPath.ts";
 
 export async function loader() {
-  const url = "https://www.youtube.com/@Gymology";
+  const url = "https://www.youtube.com/@Cercle";
   store.dispatch(setURL(url));
   await store.dispatch(getChannelDetails(extractQuery(url)));
   const channelId = store.getState().channel.channelId;

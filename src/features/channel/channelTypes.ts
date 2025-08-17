@@ -16,6 +16,11 @@ export interface channelDetailsResponse {
   items: [
     {
       id: string;
+      snippet: {
+        title: string;
+        publishedAt: string;
+        customUrl:string;
+      };
       statistics: {
         viewCount: string;
         subscriberCount: string;
