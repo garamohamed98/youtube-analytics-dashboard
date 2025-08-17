@@ -6,6 +6,7 @@ import DrawerHeader from "../ui/Drawer/DrawerHeader/DrawerHeader";
 import DrawerMenu from "../ui/Drawer/DrawwerMenu/DrawwerMenu";
 import { Outlet } from "react-router";
 import AppBarContent from "../ui/AppBar/AppBarContent/AppBarContent";
+import DrawerFooter from "../ui/Drawer/DrawerFooter/DrawerFooter";
 
 const Layout = () => {
   const [open, setOpen] = useState(false);
@@ -20,8 +21,13 @@ const Layout = () => {
         <AppBarContent handleToggle={handleToggle} />
       </AppBar>
       <Drawer variant={"permanent"} open={open}>
-        <DrawerHeader onToggle={handleToggle} open={open} />
-        <DrawerMenu open={open} setOpen={setOpen} />
+        <Box flexGrow={1}>
+          <DrawerHeader onToggle={handleToggle} open={open} />
+          <DrawerMenu open={open} setOpen={setOpen} />
+        </Box>
+        <Box py="30px">
+          <DrawerFooter />
+        </Box>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
         <Outlet />
