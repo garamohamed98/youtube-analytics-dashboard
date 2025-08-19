@@ -7,7 +7,7 @@ const ChannelInfo = () => {
   } = useChannel();
   return (
     <Box display="flex" flexDirection="column" gap="3px">
-      <Typography variant="h2">
+      <Typography variant="h2" color="text.primary">
         {channelDetails?.items[0].snippet.title}
       </Typography>
       <Typography variant="h3" color="text.secondary">
