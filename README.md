@@ -1,10 +1,26 @@
+<img src="./assets/logo.png" alt="Dashboard" width="150"/>
+
 # YouTube Analytics Dashboard
 
 A modern, real-time analytics dashboard for YouTube content creators to track channel performance, analyze video metrics, and visualize growth trends.
 
 # 🌍 Website Link
 
-[Click here to try the app](https://your-app-link.com)
+[Click here to try the app](https://ytbanalytics.netlify.app/)
+
+## Screenshots
+
+### Desktop
+
+<img src="./assets/desktop-dashboard.png" alt="Dashboard" width="350"/>
+<img src="./assets/desktop-settings.png" alt="Dashboard" width="350"/>
+
+### Mobile
+
+<img src="./assets/mobile-dashboard.png" alt="Dashboard" width="200"/>
+<img src="./assets/mobile-settings.png" alt="Dashboard" width="200"/>
+<img src="./assets/mobile-menu.png" alt="Dashboard" width="200"/>
+
 
 # Features
 

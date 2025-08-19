@@ -47,6 +47,7 @@ const BarChart = ({
       options={{
         responsive: true,
         maintainAspectRatio: false,
+
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -83,6 +84,7 @@ const BarChart = ({
           easing: "easeInOutQuart",
         },
       }}
+      style={{ width: "100%" }}
     />
   );
 };

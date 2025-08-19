@@ -32,7 +32,7 @@ const DrawerHeader = ({
         <Box px="20px">
           <Box
             component="img"
-            src="src/assets/logo.png"
+            src={"/assets/logo.png"}
             alt="logo"
             loading="lazy"
             sx={{
