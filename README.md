@@ -11,16 +11,17 @@ A modern, real-time analytics dashboard for YouTube content creators to track ch
 ## Screenshots
 
 ### Desktop
-
+<div >
 <img src="./assets/desktop-dashboard.png" alt="Dashboard" width="350"/>
 <img src="./assets/desktop-settings.png" alt="Dashboard" width="350"/>
+</div>
 
 ### Mobile
-
+<div>
 <img src="./assets/mobile-dashboard.png" alt="Dashboard" width="200"/>
 <img src="./assets/mobile-settings.png" alt="Dashboard" width="200"/>
 <img src="./assets/mobile-menu.png" alt="Dashboard" width="200"/>
-
+</div>
 
 # Features
 
